@@ -4344,6 +4344,7 @@ MonoBehaviour:
   weapon: {fileID: 114557657013353744, guid: b685a5c26872c6e4c90709254e16286b, type: 2}
   laserEffects:
   - {fileID: 8300000, guid: 00f45d151007acf49916a6ceec5e79a5, type: 3}
+  EngineEffect: {fileID: 8300000, guid: 9ef7f2d6f7ee6fe48997e95c1aa46273, type: 3}
 --- !u!82 &1645900816
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4353,11 +4354,11 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 9ef7f2d6f7ee6fe48997e95c1aa46273, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
-  Loop: 0
+  Loop: 1
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0
@@ -4572,8 +4573,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1879303616}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -101.76, y: 0, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalPosition: {x: -340.93, y: 0, z: 0}
+  m_LocalScale: {x: 50, y: 50, z: 1}
   m_Children:
   - {fileID: 423413616}
   m_Father: {fileID: 0}
@@ -4625,8 +4626,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6a1abdcfd5e06e44fa388cdcd7286ff6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mass: 50000
-  influenceRadius: 200
+  mass: 2500000
+  influenceRadius: 10000
 --- !u!1 &1912803040
 GameObject:
   m_ObjectHideFlags: 0

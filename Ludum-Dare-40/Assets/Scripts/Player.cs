@@ -58,6 +58,7 @@ public class Player : MonoBehaviour
         var shape = engineFlare.shape;
         var dir = vec.normalized;
         shape.rotation = new Vector3(dir.y, -dir.x, 0) * 90;
+        GetComponent<AudioSource>().volume = dir.normalized.magnitude;
     }
 
     void Orient(Vector2 vec) {
