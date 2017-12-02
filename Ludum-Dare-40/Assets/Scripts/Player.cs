@@ -8,12 +8,14 @@ public class Player : MonoBehaviour
     public ParticleSystem engineFlare;
     public float Engine = 10f;
     public float Torque = 10f;
-    public GameObject weaponHardPoint;
+    public GameObject[] weaponHardPoints;
     public float FireDelay = 10;
     public Laser weapon;
     public AudioClip[] laserEffects;
+    public AudioSource laserAudioSource;
 
     private float lastFired;
+    private int lastFiredPoint = 0;
 
     private void Awake() {
         lastFired = -1;
@@ -26,7 +28,7 @@ public class Player : MonoBehaviour
     void OnDisable() {
         InputManager.RemoveAction(InputManager.InputEvent.Fire, Fire);
     }
-
+    
     void FixedUpdate() {
         Vector2 movement = Vector2.zero;
         if (InputManager.IsFiring(InputManager.InputEvent.Forward))
@@ -49,6 +51,11 @@ public class Player : MonoBehaviour
 
         var worldMouse = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Orient(worldMouse);
+
+        if (InputManager.IsFiring(InputManager.InputEvent.Fire))
+        {
+            Fire();
+        }
     }
 
     void Move(Vector2 vec) {
@@ -96,15 +103,16 @@ public class Player : MonoBehaviour
         {
             body.AddTorque(Mathf.Sign(angularVelocity) * -Torque);
         }
-
     }
 
     void Fire() {
         if (lastFired + FireDelay < Time.fixedTime)
         {
-            var laser = Instantiate(weapon, weaponHardPoint.transform.position, transform.rotation, null);
+            lastFiredPoint = (lastFiredPoint + 1) % weaponHardPoints.Length;
+            var pos = weaponHardPoints[lastFiredPoint].transform.position;
+            var laser = Instantiate(weapon, pos, transform.rotation, null);
             laser.SetStartSpeed(GetComponent<Rigidbody2D>().velocity);
-            GetComponent<AudioSource>().PlayOneShot(laserEffects[Random.Range(0, laserEffects.Length)]);
+            laserAudioSource.PlayOneShot(laserEffects[Random.Range(0, laserEffects.Length)]);
             lastFired = Time.fixedTime;
         }
     }
