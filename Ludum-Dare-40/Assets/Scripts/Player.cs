@@ -9,10 +9,14 @@ public class Player : MonoBehaviour
     public float Engine = 10f;
     public float Torque = 10f;
     public GameObject weaponHardPoint;
+    public float FireDelay = 10;
     public Laser weapon;
     public AudioClip[] laserEffects;
 
+    private float lastFired;
+
     private void Awake() {
+        lastFired = -1;
     }
 
     void OnEnable() {
@@ -95,8 +99,12 @@ public class Player : MonoBehaviour
     }
 
     void Fire() {
-        var laser = Instantiate(weapon, weaponHardPoint.transform.position, transform.rotation, null);
-        laser.SetStartSpeed(GetComponent<Rigidbody2D>().velocity);
-        GetComponent<AudioSource>().PlayOneShot(laserEffects[Random.Range(0, laserEffects.Length)]);
+        if (lastFired + FireDelay < Time.fixedTime)
+        {
+            var laser = Instantiate(weapon, weaponHardPoint.transform.position, transform.rotation, null);
+            laser.SetStartSpeed(GetComponent<Rigidbody2D>().velocity);
+            GetComponent<AudioSource>().PlayOneShot(laserEffects[Random.Range(0, laserEffects.Length)]);
+            lastFired = Time.fixedTime;
+        }
     }
 }
