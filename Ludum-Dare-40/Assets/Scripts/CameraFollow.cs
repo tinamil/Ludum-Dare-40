@@ -12,7 +12,7 @@ public class CameraFollow : MonoBehaviour
     
 
     // Update is called once per frame
-    void Update() {
+    void LateUpdate() {
         var targetPos = Vector2.SmoothDamp(transform.position, target.transform.position, ref velocity, smoothTime, maxSpeed, Time.deltaTime);
         transform.position = new Vector3(targetPos.x, targetPos.y, transform.position.z);
     }

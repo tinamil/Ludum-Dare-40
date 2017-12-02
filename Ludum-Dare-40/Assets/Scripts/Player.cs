@@ -5,20 +5,22 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
 {
-
+    public ParticleSystem engineFlare;
     public float Engine = 10f;
     public float Torque = 10f;
-
+    public GameObject weaponHardPoint;
+    public Laser weapon;
+    public AudioClip[] laserEffects;
 
     private void Awake() {
     }
 
     void OnEnable() {
-
+        InputManager.AddAction(InputManager.InputEvent.Fire, Fire);
     }
 
     void OnDisable() {
-
+        InputManager.RemoveAction(InputManager.InputEvent.Fire, Fire);
     }
 
     void FixedUpdate() {
@@ -47,13 +49,18 @@ public class Player : MonoBehaviour
 
     void Move(Vector2 vec) {
         GetComponent<Rigidbody2D>().AddRelativeForce(vec * Engine);
+        var emission = engineFlare.emission;
+        emission.rateOverTimeMultiplier = vec.normalized.magnitude * 100;
+        var shape = engineFlare.shape;
+        var dir = vec.normalized;
+        shape.rotation = new Vector3(dir.y, -dir.x, 0) * 90;
     }
 
     void Orient(Vector2 vec) {
         var body = GetComponent<Rigidbody2D>();
         var angularVelocity = body.angularVelocity;
         var distance = Vector2.SignedAngle(transform.right, vec - (Vector2)transform.position);
-        var angularAcceleration = Torque / GetComponent<Rigidbody2D>().inertia;
+        var angularAcceleration = Torque * Mathf.Rad2Deg / GetComponent<Rigidbody2D>().inertia;
         var maxVelChange = angularAcceleration * Time.fixedDeltaTime;
         var maxDisThisDelta = 0.5f * maxVelChange * Time.fixedDeltaTime;
 
@@ -71,22 +78,25 @@ public class Player : MonoBehaviour
             return;
         }
 
-        var stopDistance = 0.5 * angularVelocity * angularVelocity / angularAcceleration * Time.deltaTime;
+        var stopDistance = 0.5 * angularVelocity * angularVelocity / angularAcceleration;
+        var deltaVel = distance / Time.fixedDeltaTime;
         var direction = Mathf.Sign(distance);
         if (stopDistance < Mathf.Abs(distance))
         {
-            if (distance < maxDisThisDelta * 4)
-            {
-                body.AddTorque(Mathf.Sign(distance) * Torque / 2);
-            } else
-            {
-                body.AddTorque(Mathf.Sign(distance) * Torque);
-            }
+            body.AddTorque(Mathf.Sign(distance) * Torque);
+        } else if (Mathf.Abs(deltaVel) < Torque * Time.fixedDeltaTime)
+        {
+            body.AddTorque(Mathf.Sign(distance) * (deltaVel - angularVelocity));
         } else
         {
             body.AddTorque(Mathf.Sign(angularVelocity) * -Torque);
         }
-        
+
     }
 
+    void Fire() {
+        var laser = Instantiate(weapon, weaponHardPoint.transform.position, transform.rotation, null);
+        laser.SetStartSpeed(GetComponent<Rigidbody2D>().velocity);
+        GetComponent<AudioSource>().PlayOneShot(laserEffects[Random.Range(0, laserEffects.Length)]);
+    }
 }
