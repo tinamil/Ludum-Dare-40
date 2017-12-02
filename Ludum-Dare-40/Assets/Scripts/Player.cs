@@ -63,13 +63,11 @@ public class Player : MonoBehaviour
         {
             body.MoveRotation(body.rotation + distance);
             body.angularVelocity = 0;
-            Debug.Log("Arrived at target.  Stopping motion");
             return;
         }
         if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) >= maxDisThisDelta)
         {
             body.AddTorque(Mathf.Sign(distance) * Torque);
-            Debug.Log("No rotation currently, accelerating at " + Torque + " , need to move " + distance + " degrees");
             return;
         }
 
@@ -77,7 +75,6 @@ public class Player : MonoBehaviour
         var direction = Mathf.Sign(distance);
         if (stopDistance < Mathf.Abs(distance))
         {
-            Debug.Log("Accel");
             if (distance < maxDisThisDelta * 4)
             {
                 body.AddTorque(Mathf.Sign(distance) * Torque / 2);
@@ -87,11 +84,9 @@ public class Player : MonoBehaviour
             }
         } else
         {
-            Debug.Log("Decel");
             body.AddTorque(Mathf.Sign(angularVelocity) * -Torque);
         }
-
-        Debug.Log("Distance = " + distance + " vel = " + angularVelocity + " accel = " + angularAcceleration + " stop = " + stopDistance);
+        
     }
 
 }
