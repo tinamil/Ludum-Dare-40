@@ -9,30 +9,35 @@ public class Player : MonoBehaviour
     public float Engine = 10f;
     public float Torque = 10f;
 
+
+    private void Awake() {
+    }
+
     void OnEnable() {
+
     }
 
     void OnDisable() {
 
     }
 
-    void Update() {
+    void FixedUpdate() {
         Vector2 movement = Vector2.zero;
         if (InputManager.IsFiring(InputManager.InputEvent.Forward))
         {
-            movement.y += 1;
+            movement.x += 1;
         }
         if (InputManager.IsFiring(InputManager.InputEvent.Backward))
         {
-            movement.y -= 1;
+            movement.x -= 1;
         }
         if (InputManager.IsFiring(InputManager.InputEvent.Left))
         {
-            movement.x -= 1;
+            movement.y += 1;
         }
         if (InputManager.IsFiring(InputManager.InputEvent.Right))
         {
-            movement.x += 1;
+            movement.y -= 1;
         }
         Move(movement);
 
@@ -47,45 +52,46 @@ public class Player : MonoBehaviour
     void Orient(Vector2 vec) {
         var body = GetComponent<Rigidbody2D>();
         var angularVelocity = body.angularVelocity;
-        var distance = Vector2.SignedAngle(transform.right, vec);
-        if (angularVelocity == 0 && distance == 0) return;
-        var inertia = GetComponent<Rigidbody2D>().inertia;
-        var angularAcceleration = Torque / inertia;
+        var distance = Vector2.SignedAngle(transform.right, vec - (Vector2)transform.position);
+        var angularAcceleration = Torque / GetComponent<Rigidbody2D>().inertia;
         var maxVelChange = angularAcceleration * Time.fixedDeltaTime;
-        var maxDisPerDelta = 0.5f * maxVelChange * Time.fixedDeltaTime;
-        if (Mathf.Abs(angularVelocity) < maxVelChange && Mathf.Abs(distance) < maxDisPerDelta)
+        var maxDisThisDelta = 0.5f * maxVelChange * Time.fixedDeltaTime;
+
+        if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) <= Mathf.Epsilon) return;
+
+        if (Mathf.Abs(angularVelocity) < maxVelChange && Mathf.Abs(distance) < maxDisThisDelta)
         {
-            body.MoveRotation(distance);
-            body.AddTorque(-body.angularVelocity * body.inertia, ForceMode2D.Impulse);
+            body.MoveRotation(body.rotation + distance);
+            body.angularVelocity = 0;
+            Debug.Log("Arrived at target.  Stopping motion");
             return;
         }
-        if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) >= maxDisPerDelta)
+        if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) >= maxDisThisDelta)
         {
             body.AddTorque(Mathf.Sign(distance) * Torque);
+            Debug.Log("No rotation currently, accelerating at " + Torque + " , need to move " + distance + " degrees");
             return;
         }
 
-        var timePerSpin = 360 / Mathf.Abs(angularVelocity);
-        if(Mathf.Abs(angularVelocity) > 0.5f * angularAcceleration * timePerSpin)
+        var stopDistance = 0.5 * angularVelocity * angularVelocity / angularAcceleration * Time.deltaTime;
+        var direction = Mathf.Sign(distance);
+        if (stopDistance < Mathf.Abs(distance))
         {
-            body.AddTorque(Mathf.Sign(angularVelocity) * -Torque);
-            return;
-        }
-
-        var timeToArrival = 2 * distance / angularVelocity;
-        if(timeToArrival < 0)
-        {
-            body.AddTorque(Mathf.Sign(distance) * Torque);
-            return;
-        }
-        var maxStopVel = angularAcceleration * timeToArrival;
-        if (Mathf.Abs(angularVelocity) > maxStopVel)
-        {
-            body.AddTorque(Mathf.Sign(distance) * -Torque);
+            Debug.Log("Accel");
+            if (distance < maxDisThisDelta * 4)
+            {
+                body.AddTorque(Mathf.Sign(distance) * Torque / 2);
+            } else
+            {
+                body.AddTorque(Mathf.Sign(distance) * Torque);
+            }
         } else
         {
-            body.AddTorque(Mathf.Sign(distance) * Torque);
+            Debug.Log("Decel");
+            body.AddTorque(Mathf.Sign(angularVelocity) * -Torque);
         }
+
+        Debug.Log("Distance = " + distance + " vel = " + angularVelocity + " accel = " + angularAcceleration + " stop = " + stopDistance);
     }
-    
+
 }
