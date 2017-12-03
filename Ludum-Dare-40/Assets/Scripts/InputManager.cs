@@ -9,7 +9,7 @@ public class InputManager : MonoBehaviour
 
     public enum InputEvent
     {
-        Forward, Left, Right, Backward, Fire
+        Forward, Left, Right, Backward, Fire, OpenMenu
     }
 
     static Dictionary<InputEvent, KeyCode> mapping;
@@ -47,6 +47,7 @@ public class InputManager : MonoBehaviour
         mapping.Add(InputEvent.Right, (KeyCode)PlayerPrefs.GetInt(InputEvent.Right.ToString(), (int)KeyCode.D));
         mapping.Add(InputEvent.Backward, (KeyCode)PlayerPrefs.GetInt(InputEvent.Backward.ToString(), (int)KeyCode.S));
         mapping.Add(InputEvent.Fire, (KeyCode)PlayerPrefs.GetInt(InputEvent.Backward.ToString(), (int)KeyCode.Space));
+        mapping.Add(InputEvent.OpenMenu, (KeyCode)PlayerPrefs.GetInt(InputEvent.Backward.ToString(), (int)KeyCode.Escape));
     }
 
     // Update is called once per frame
