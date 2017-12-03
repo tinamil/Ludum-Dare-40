@@ -30,6 +30,8 @@ public class Player : MonoBehaviour
     public RectTransform LaserUI;
     public RectTransform HealthUI;
 
+    public AudioClip powerup;
+
     private float lastFired;
     private float lastLaserRecharge;
     private int lastFiredPoint = 0;
@@ -62,6 +64,25 @@ public class Player : MonoBehaviour
         if ("Enemy".Equals(collision.gameObject.tag))
         {
             TakeDamage(collision.gameObject.GetComponent<Enemy>().Damage);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision) {
+        if ("HealthPickup".Equals(collision.gameObject.tag))
+        {
+            GetComponent<AudioSource>().PlayOneShot(powerup);
+            HPRemaining = Mathf.Clamp(HPRemaining + 1, 0, HealthCapacity);
+            Destroy(collision.gameObject);
+        }
+        if ("BoltPickup".Equals(collision.gameObject.tag))
+        {
+            GetComponent<AudioSource>().PlayOneShot(powerup);
+            laserCharge = LaserCapacity;
+            Destroy(collision.gameObject);
+        }
+        if ("Star".Equals(collision.gameObject.tag))
+        {
+            Destroy(collision.gameObject);
         }
     }
 
@@ -143,17 +164,17 @@ public class Player : MonoBehaviour
         var distance = Vector2.SignedAngle(transform.right, vec - (Vector2)transform.position);
         var angularAcceleration = Torque * Mathf.Rad2Deg / GetComponent<Rigidbody2D>().inertia;
         var maxVelChange = angularAcceleration * Time.fixedDeltaTime;
-        var maxDisThisDelta = 0.5f * maxVelChange * Time.fixedDeltaTime;
-
+        var maxDegreesThisDelta = 0.5f * maxVelChange * Time.fixedDeltaTime;
+        //Debug.Log("Angular velocity = " + angularVelocity + " accel = " + angularAcceleration + " Time = " + Time.fixedTime + " distance = " + Vector2.Angle(Vector2.right, transform.right));
         if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) <= Mathf.Epsilon) return;
 
-        if (Mathf.Abs(angularVelocity) < maxVelChange && Mathf.Abs(distance) < maxDisThisDelta)
+        if (Mathf.Abs(angularVelocity) < maxVelChange && Mathf.Abs(distance) < maxDegreesThisDelta)
         {
             body.MoveRotation(body.rotation + distance);
             body.angularVelocity = 0;
             return;
         }
-        if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) >= maxDisThisDelta)
+        if (Mathf.Abs(angularVelocity) <= Mathf.Epsilon && Mathf.Abs(distance) >= maxDegreesThisDelta)
         {
             body.AddTorque(Mathf.Sign(distance) * Torque);
             return;
@@ -164,12 +185,15 @@ public class Player : MonoBehaviour
 
         if (stopDistance < Mathf.Abs(distance))
         {
+            //Debug.Log("Accelerating");
             body.AddTorque(Mathf.Sign(distance) * Torque);
         } else if (Mathf.Abs(deltaVel) < Torque * Time.fixedDeltaTime)
         {
+            //Debug.Log("Accelerating slowly");
             body.AddTorque(Mathf.Sign(distance) * (deltaVel - angularVelocity));
         } else
         {
+            //Debug.Log("Decelerating");
             body.AddTorque(Mathf.Sign(angularVelocity) * -Torque);
         }
     }

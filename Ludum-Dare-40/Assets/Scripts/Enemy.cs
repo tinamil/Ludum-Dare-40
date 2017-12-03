@@ -9,6 +9,9 @@ public class Enemy : MonoBehaviour {
     public int Damage = 1;
     public GameObject Explosion;
     public AudioClip hurtClip;
+    public AudioClip dropClip;
+    public GameObject[] dropItems;
+    public float dropChance;
 
     // Use this for initialization
     void Start () {
@@ -21,6 +24,11 @@ public class Enemy : MonoBehaviour {
 	}
 
     public void DestroyMe() {
+        if(Random.value <= dropChance)
+        {
+            MusicController.PlayClip(dropClip);
+            Instantiate(dropItems[Random.Range(0, dropItems.Length)], transform.position, Quaternion.identity);
+        }
         Instantiate(Explosion, transform.position, transform.rotation);
         Destroy(this.gameObject);
     }

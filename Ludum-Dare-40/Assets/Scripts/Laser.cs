@@ -30,15 +30,19 @@ public class Laser : MonoBehaviour
 
 
     private void OnTriggerEnter2D(Collider2D collision) {
-        var enemy = collision.attachedRigidbody.gameObject.GetComponent<Enemy>();
-        if (enemy != null)
+        var body = collision.attachedRigidbody;
+        if (body != null)
         {
-            enemy.TakeDamage(damage);
-            Destroy(gameObject);
-        }
-        if("Asteroid".Equals(collision.attachedRigidbody.gameObject.tag))
-        {
-            Destroy(gameObject);
+            var enemy = body.gameObject.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemy.TakeDamage(damage);
+                Destroy(gameObject);
+            }
+            if ("Asteroid".Equals(body.gameObject.tag))
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

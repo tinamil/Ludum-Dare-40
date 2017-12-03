@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Asteroid
   - Enemy
+  - HealthPickup
+  - BoltPickup
+  - Star
   layers:
   - Default
   - TransparentFX

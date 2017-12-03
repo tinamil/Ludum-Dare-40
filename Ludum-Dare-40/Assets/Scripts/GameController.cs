@@ -30,4 +30,6 @@ public class GameController : MonoBehaviour {
         Menu.UnFade();
         Time.timeScale = 0;
     }
+
+    
 }
