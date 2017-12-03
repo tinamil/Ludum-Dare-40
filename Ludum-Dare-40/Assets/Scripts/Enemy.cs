@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(AudioSource))]
 public class Enemy : MonoBehaviour {
 
     public int HP = 1;
+    public int Damage = 1;
     public GameObject Explosion;
+    public AudioClip hurtClip;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -18,7 +21,7 @@ public class Enemy : MonoBehaviour {
 	}
 
     public void DestroyMe() {
-        Instantiate(Explosion);
+        Instantiate(Explosion, transform.position, transform.rotation);
         Destroy(this.gameObject);
     }
 
@@ -27,6 +30,9 @@ public class Enemy : MonoBehaviour {
         if (HP <= 0)
         {
             DestroyMe();
+        } else if(hurtClip != null)
+        {
+            GetComponent<AudioSource>().PlayOneShot(hurtClip);
         }
     }
 }

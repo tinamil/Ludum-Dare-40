@@ -1,6 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour
@@ -11,14 +14,70 @@ public class Player : MonoBehaviour
     public GameObject[] weaponHardPoints;
     public float FireDelay = 10;
     public Laser weapon;
+    public GameObject shield;
     public AudioClip[] laserEffects;
     public AudioSource laserAudioSource;
+    public int HealthCapacity = 10;
+    public int LaserCapacity = 100;
+    public float LaserRechargeRate = .2f;
+    public float LaserRechargeDelay = 1;
+
+    public int ShieldCapacity = 2;
+    public int ShieldRechargeRate = 5;
+
+    public TextMeshProUGUI HPText;
+    public RectTransform ShieldUI; //400px height each
+    public RectTransform LaserUI;
+    public RectTransform HealthUI;
 
     private float lastFired;
+    private float lastLaserRecharge;
     private int lastFiredPoint = 0;
+    private int laserCharge;
+
+    private float lastShieldRecharge;
+    private int shieldCharge;
+    private float lastDamageTaken;
+    private float immunity = 0.2f;
+
+    private int HPRemaining;
 
     private void Awake() {
         lastFired = -1;
+        laserCharge = LaserCapacity;
+        shieldCharge = ShieldCapacity;
+        HPRemaining = HealthCapacity;
+    }
+
+    private void Update() {
+        LaserUI.sizeDelta = new Vector2(0, (float)laserCharge / LaserCapacity * 400);
+        ShieldUI.sizeDelta = new Vector2(0, (float)shieldCharge / ShieldCapacity * 400);
+        HealthUI.sizeDelta = new Vector2(0, (float)HPRemaining / HealthCapacity * 400);
+        shield.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, (float)shieldCharge / ShieldCapacity);
+        shield.SetActive(shieldCharge > 0);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision) {
+        Debug.Log("Collided with " + collision.gameObject.name);
+        if ("Enemy".Equals(collision.gameObject.tag))
+        {
+            TakeDamage(collision.gameObject.GetComponent<Enemy>().Damage);
+        }
+    }
+
+    private void TakeDamage(int damage) {
+        if (lastDamageTaken + immunity < Time.fixedTime)
+        {
+            if (shieldCharge > 0)
+            {
+                shieldCharge -= damage;
+            } else
+            {
+                HPRemaining -= damage;
+            }
+            lastDamageTaken = Time.fixedTime;
+        }
+
     }
 
     void OnEnable() {
@@ -28,7 +87,7 @@ public class Player : MonoBehaviour
     void OnDisable() {
         InputManager.RemoveAction(InputManager.InputEvent.Fire, Fire);
     }
-    
+
     void FixedUpdate() {
         Vector2 movement = Vector2.zero;
         if (InputManager.IsFiring(InputManager.InputEvent.Forward))
@@ -55,6 +114,16 @@ public class Player : MonoBehaviour
         if (InputManager.IsFiring(InputManager.InputEvent.Fire))
         {
             Fire();
+        }
+        if (lastFired + LaserRechargeDelay < Time.fixedTime && lastLaserRecharge + LaserRechargeRate < Time.fixedTime)
+        {
+            lastLaserRecharge = Time.fixedTime;
+            laserCharge = Mathf.Clamp(laserCharge + 1, 0, LaserCapacity);
+        }
+        if (lastShieldRecharge + ShieldRechargeRate < Time.fixedTime)
+        {
+            lastShieldRecharge = Time.fixedTime;
+            shieldCharge = Mathf.Clamp(shieldCharge + 1, 0, ShieldCapacity);
         }
     }
 
@@ -92,7 +161,7 @@ public class Player : MonoBehaviour
 
         var stopDistance = 0.5 * angularVelocity * angularVelocity / angularAcceleration;
         var deltaVel = distance / Time.fixedDeltaTime;
-        var direction = Mathf.Sign(distance);
+
         if (stopDistance < Mathf.Abs(distance))
         {
             body.AddTorque(Mathf.Sign(distance) * Torque);
@@ -106,14 +175,15 @@ public class Player : MonoBehaviour
     }
 
     void Fire() {
-        if (lastFired + FireDelay < Time.fixedTime)
+        if (lastFired + FireDelay < Time.fixedTime && laserCharge > 0)
         {
             lastFiredPoint = (lastFiredPoint + 1) % weaponHardPoints.Length;
             var pos = weaponHardPoints[lastFiredPoint].transform.position;
             var laser = Instantiate(weapon, pos, transform.rotation, null);
             laser.SetStartSpeed(GetComponent<Rigidbody2D>().velocity);
-            laserAudioSource.PlayOneShot(laserEffects[Random.Range(0, laserEffects.Length)]);
+            laserAudioSource.PlayOneShot(laserEffects[UnityEngine.Random.Range(0, laserEffects.Length)]);
             lastFired = Time.fixedTime;
+            laserCharge -= 1;
         }
     }
 }

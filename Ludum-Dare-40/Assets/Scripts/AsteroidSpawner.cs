@@ -11,7 +11,7 @@ public class AsteroidSpawner : MonoBehaviour
 
     // Use this for initialization
     void Start() {
-
+        Random.InitState((int)System.DateTime.Now.Ticks);
         for (int i = 0; i < numAsteroids; i++)
         {
             Vector3 position = Random.insideUnitCircle * radius;

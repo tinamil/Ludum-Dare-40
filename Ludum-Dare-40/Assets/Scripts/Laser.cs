@@ -36,7 +36,6 @@ public class Laser : MonoBehaviour
             enemy.TakeDamage(damage);
             Destroy(gameObject);
         }
-        Debug.Log("Hit = " + collision.attachedRigidbody.gameObject.tag);
         if("Asteroid".Equals(collision.attachedRigidbody.gameObject.tag))
         {
             Destroy(gameObject);
