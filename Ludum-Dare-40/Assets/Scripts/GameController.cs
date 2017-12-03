@@ -4,15 +4,33 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour {
 
-    public FadeOut Menu;
+    private static GameController instance;
 
-	// Use this for initialization
-	void Start () {
-        Time.timeScale = 0;
+    public FadeOut Menu;
+    public GameObject EndGame;
+
+    private void Awake() {
+        instance = this;
+    }
+
+    void Start () {
+        Pause();
 	}
 	
     public void StartGame() {
+        Resume();
+    }
+
+    public static void Pause() {
+        Time.timeScale = 0;
+    }
+
+    public static void Resume() {
         Time.timeScale = 1;
+    }
+
+    public static void Endgame() {
+        instance.EndGame.SetActive(true);
     }
 
     public void Exit() {

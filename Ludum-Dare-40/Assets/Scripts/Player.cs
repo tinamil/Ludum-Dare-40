@@ -95,6 +95,10 @@ public class Player : MonoBehaviour
             } else
             {
                 HPRemaining -= damage;
+                if (HPRemaining <= 0)
+                {
+                    GameController.Endgame();
+                }
             }
             lastDamageTaken = Time.fixedTime;
         }
