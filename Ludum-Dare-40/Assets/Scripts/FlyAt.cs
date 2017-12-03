@@ -6,6 +6,7 @@ using UnityEngine;
 public class FlyAt : MonoBehaviour {
 
     public string targetTag;
+    public Vector3 forward;
 
     private GameObject target;
 
@@ -19,7 +20,7 @@ public class FlyAt : MonoBehaviour {
             var body = GetComponent<Rigidbody2D>();
             var direction =  target.transform.position - transform.position;
             body.AddForce(direction);
-            body.rotation = (body.rotation + Vector2.SignedAngle(transform.right, direction));
+            body.rotation = (body.rotation + Vector2.SignedAngle(transform.TransformDirection(forward), direction));
         }
     }
 }

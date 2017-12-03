@@ -70,13 +70,13 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision) {
         if ("HealthPickup".Equals(collision.gameObject.tag))
         {
-            GetComponent<AudioSource>().PlayOneShot(powerup);
+            MusicController.PlayClip(powerup);
             HPRemaining = Mathf.Clamp(HPRemaining + 1, 0, HealthCapacity);
             Destroy(collision.gameObject);
         }
         if ("BoltPickup".Equals(collision.gameObject.tag))
         {
-            GetComponent<AudioSource>().PlayOneShot(powerup);
+            MusicController.PlayClip(powerup);
             laserCharge = LaserCapacity;
             Destroy(collision.gameObject);
         }

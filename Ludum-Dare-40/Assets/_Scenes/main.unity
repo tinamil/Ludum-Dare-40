@@ -6312,16 +6312,6 @@ Prefab:
       propertyPath: HealthUI
       value: 
       objectReference: {fileID: 1912114085}
-    - target: {fileID: 114848926741803478, guid: 04821786fce492745bb4b3d409e346e9,
-        type: 2}
-      propertyPath: Torque
-      value: 1000
-      objectReference: {fileID: 0}
-    - target: {fileID: 114848926741803478, guid: 04821786fce492745bb4b3d409e346e9,
-        type: 2}
-      propertyPath: Engine
-      value: 1000
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 04821786fce492745bb4b3d409e346e9, type: 2}
   m_IsPrefabParent: 0
