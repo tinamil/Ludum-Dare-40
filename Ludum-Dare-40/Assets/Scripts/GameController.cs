@@ -12,9 +12,8 @@ public class GameController : MonoBehaviour
     public GameObject EndGame;
     public TMPro.TextMeshProUGUI VictoryScreen;
 
-    private int totalStars;
+    private List<GameObject> stars;
     private float enemiesDestroyed = 0;
-    private float starPickup = 0;
     private float playerHit = 0;
 
     private void Awake() {
@@ -22,7 +21,7 @@ public class GameController : MonoBehaviour
     }
 
     void Start() {
-        totalStars = GameObject.FindGameObjectsWithTag("Star").Length;
+        stars = new List<GameObject>(GameObject.FindGameObjectsWithTag("Star"));
         Pause();
     }
 
@@ -59,10 +58,13 @@ public class GameController : MonoBehaviour
     }
 
     public static void PickupStar(GameObject gameObject) {
-        instance.starPickup += 1;
-        if (instance.starPickup >= instance.totalStars)
+        if (instance.stars.Remove(gameObject))
         {
-            instance.DisplayVictory();
+            EnemySpawner.IncreaseDifficulty();
+            if (instance.stars.Count == 0)
+            {
+                instance.DisplayVictory();
+            }
         }
     }
 
@@ -70,12 +72,11 @@ public class GameController : MonoBehaviour
         string victoryMessage = string.Format(
 @"Congratulations on your victory!
 
-You destroyed {0} enemies
-
-You were hit {1} times
+You destroyed {0} enemies 
+and finished the run in {1} seconds.
 
 Press any key to restart
-", enemiesDestroyed, playerHit);
+", enemiesDestroyed, Time.time);
 
         VictoryScreen.text = victoryMessage;
         VictoryScreen.gameObject.SetActive(true);

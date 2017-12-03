@@ -5,15 +5,20 @@ using UnityEngine;
 public class EnemySpawner : MonoBehaviour
 {
 
+    private static EnemySpawner instance;
+
     public float secondsPerEnemy;
     public float radius;
-    public float maxEnemies;
     public float difficultyRate;
     public float minimumSecondsPerEnemy;
     public GameObject[] Enemies;
     public GameObject player;
 
     private float lastEnemySpawned = 0;
+
+    private void Awake() {
+        instance = this;
+    }
 
     // Use this for initialization
     void Start() {
@@ -23,7 +28,7 @@ public class EnemySpawner : MonoBehaviour
     IEnumerator SpawnEnemies() {
         while (true)
         {
-            if(lastEnemySpawned + secondsPerEnemy < Time.time)
+            if (lastEnemySpawned + secondsPerEnemy < Time.time)
             {
                 SpawnEnemy();
             }
@@ -32,11 +37,14 @@ public class EnemySpawner : MonoBehaviour
 
     }
 
+    public static void IncreaseDifficulty() {
+        instance.secondsPerEnemy = Mathf.Clamp(instance.secondsPerEnemy - instance.difficultyRate, instance.minimumSecondsPerEnemy, instance.secondsPerEnemy);
+    }
+
     void SpawnEnemy() {
         Vector2 position = (Vector2)player.transform.position + Random.insideUnitCircle.normalized * Random.Range(.5f, 1f) * radius;
         Instantiate(Enemies[Random.Range(0, Enemies.Length)], position, Quaternion.identity);
         lastEnemySpawned = Time.time;
-        secondsPerEnemy = Mathf.Clamp(secondsPerEnemy - difficultyRate, minimumSecondsPerEnemy, secondsPerEnemy);
     }
 
 }

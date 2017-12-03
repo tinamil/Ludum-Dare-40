@@ -61,7 +61,6 @@ public class Player : MonoBehaviour
     }
 
     private void OnCollisionEnter2D(Collision2D collision) {
-        Debug.Log("Collided with " + collision.gameObject.name);
         if ("Enemy".Equals(collision.gameObject.tag))
         {
             TakeDamage(collision.gameObject.GetComponent<Enemy>().Damage);
@@ -84,6 +83,7 @@ public class Player : MonoBehaviour
         }
         if ("Star".Equals(collision.gameObject.tag))
         {
+            Debug.LogWarning("Star Collision!");
             GameController.PickupStar(collision.gameObject);
             MusicController.PlayClip(starPickup);
             Destroy(collision.gameObject);
