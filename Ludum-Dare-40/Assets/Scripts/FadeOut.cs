@@ -8,8 +8,17 @@ public class FadeOut : MonoBehaviour
 {
 
     public float seconds;
+    public bool fadeOnStart = false;
+    public bool destroyAfterDone = false;
 
     private float startTime;
+
+    private void Start() {
+        if (fadeOnStart)
+        {
+            Fade();
+        }
+    }
 
     public void Fade() {
         StartCoroutine(FadeRoutine());
@@ -42,6 +51,12 @@ public class FadeOut : MonoBehaviour
                 color.a = Mathf.Clamp01(1 - ((Time.time - startTime) / seconds));
                 c.color = color;
             }
+            foreach (var c in GetComponentsInChildren<SpriteRenderer>())
+            {
+                var color = c.color;
+                color.a = Mathf.Clamp01(1 - ((Time.time - startTime) / seconds));
+                c.color = color;
+            }
             foreach (var c in GetComponentsInChildren<TextMeshProUGUI>())
             {
                 var color = c.color;
@@ -50,11 +65,19 @@ public class FadeOut : MonoBehaviour
             }
             yield return null;
         }
+        if (destroyAfterDone)
+        {
+            Destroy(gameObject);
+        }
         foreach (var c in GetComponentsInChildren<Image>())
         {
             c.gameObject.SetActive(false);
         }
         foreach (var c in GetComponentsInChildren<TextMeshProUGUI>())
+        {
+            c.gameObject.SetActive(false);
+        }
+        foreach (var c in GetComponentsInChildren<SpriteRenderer>())
         {
             c.gameObject.SetActive(false);
         }

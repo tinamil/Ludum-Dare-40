@@ -31,6 +31,7 @@ public class Player : MonoBehaviour
     public RectTransform HealthUI;
 
     public AudioClip powerup;
+    public AudioClip starPickup;
 
     private float lastFired;
     private float lastLaserRecharge;
@@ -64,6 +65,7 @@ public class Player : MonoBehaviour
         if ("Enemy".Equals(collision.gameObject.tag))
         {
             TakeDamage(collision.gameObject.GetComponent<Enemy>().Damage);
+            collision.gameObject.GetComponent<Enemy>().TakeDamage(1);
         }
     }
 
@@ -82,6 +84,8 @@ public class Player : MonoBehaviour
         }
         if ("Star".Equals(collision.gameObject.tag))
         {
+            GameController.PickupStar(collision.gameObject);
+            MusicController.PlayClip(starPickup);
             Destroy(collision.gameObject);
         }
     }
@@ -95,6 +99,7 @@ public class Player : MonoBehaviour
             } else
             {
                 HPRemaining -= damage;
+                GameController.PlayerHit();
                 if (HPRemaining <= 0)
                 {
                     GameController.Endgame();

@@ -10,6 +10,7 @@ public class LightPulse : MonoBehaviour {
     private float two_pi = Mathf.PI * 2;
 
     private void Start() {
+        strength = Random.value * two_pi;
         StartCoroutine(Pulse());
     }
 
