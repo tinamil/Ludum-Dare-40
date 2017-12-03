@@ -6,6 +6,10 @@
 [Bb]in/
 AssetStoreTools/
 AssetStoreTools.meta
+PostProcessing/
+TextMesh\ Pro/
+TextMesh\ Pro.meta
+PostProcessing.meta
 
 # Visual Studio 2015 cache directory
 ExportedObj/
